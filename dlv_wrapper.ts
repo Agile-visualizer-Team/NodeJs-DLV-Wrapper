@@ -1,22 +1,14 @@
 
-import { exec } from 'child_process';
-var DLVWrapper = {
-    run_dlv : (dlv_path: string, asp_file: string) : Promise<string> =>{
-        return new Promise((resolve, reject) =>{
-            exec(`${dlv_path} ${asp_file}`, (error, stdout, stderr) => {
-                if (error) {
-                    reject(new Error(`Error while running ${dlv_path} ${asp_file}\n ${error}`))
-                }
-                else if(stdout){
-                    resolve(stdout);
-                }
-                else{
-                    reject(new Error(stderr));
-                }
-            });
-        });
-    },
-    parse_dlv_as : (dlv_output: string): object =>{
+import { execSync } from 'child_process';
+import { writeFile } from 'fs';
+
+export class DLVWrapper{
+
+    run_dlv(dlv_path: string, asp_file: string) {
+        return "" + execSync(`${dlv_path} ${asp_file}`);
+    }
+
+    parse_dlv_as(dlv_output: string){
         let splitted_output = dlv_output.split('\n');
         let result_object: {[id: string] : any} = {
             'as' : [],
@@ -37,5 +29,26 @@ var DLVWrapper = {
         return result_object;
     }
 
+    write_parsed_as_to_file(parsed_output){
+        writeFile("output.json", JSON.stringify(parsed_output), 'utf8', function (err) {
+            if (err) {
+                console.log("An error occured while writing JSON Object to File.");
+                return console.log(err);
+            }
+         
+            console.log("JSON file has been saved.");
+        });
+    }
 }
-export {DLVWrapper}
+
+function main(){
+    let wrapped = new DLVWrapper()
+    let res = wrapped.run_dlv('./dlv', 'asp_test/asptest1.asp');
+    let parsed_as = wrapped.parse_dlv_as(res)
+    wrapped.write_parsed_as_to_file([parsed_as]);
+}
+
+
+if (require.main === module) {
+    main();
+}
