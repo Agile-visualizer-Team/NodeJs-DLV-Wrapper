@@ -29,11 +29,10 @@ export class DLVWrapper{
         return result_object;
     }
 
-    write_parsed_as_to_file(parsed_output){
+    write_parsed_as_to_file(parsed_output : object){7
         writeFile("output.json", JSON.stringify(parsed_output), 'utf8', function (err) {
             if (err) {
                 console.log("An error occured while writing JSON Object to File.");
-                return console.log(err);
             }
          
             console.log("JSON file has been saved.");

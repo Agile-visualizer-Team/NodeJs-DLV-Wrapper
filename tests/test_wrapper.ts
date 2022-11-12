@@ -3,6 +3,7 @@ import 'mocha';
 import sinon from 'sinon';
 import { DLVWrapper } from '../dlv_wrapper'
 var child_process = require('child_process')
+var fs = require('fs')
 
 const dlvWrapper = new DLVWrapper()
 
@@ -79,4 +80,25 @@ describe('run_dlv()',() =>{
     
     });
   });
+
+
+  describe('write_parsed_as_to_file()', () =>{
+    it('should get called with right arguments', () => {
+
+      const test_cases = [
+        {
+          input : { as: [ 'm(2)', 's(2,3)' ], cost: '' },
+        },
+      ]
+
+      test_cases.forEach((test) =>{
+        let mocked_writefile =  sinon.mock(fs)
+        let expectation = mocked_writefile.expects('writeFile')
+        let spy = sinon.spy(console, 'log')
+        dlvWrapper.write_parsed_as_to_file(test.input)
+        expect(expectation.getCall(0).args.includes(JSON.stringify(test.input))).to.be.true
+      });
+
+    })
+  })
 });

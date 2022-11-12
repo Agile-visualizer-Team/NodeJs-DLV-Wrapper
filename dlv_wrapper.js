@@ -30,10 +30,10 @@ var DLVWrapper = /** @class */ (function () {
         return result_object;
     };
     DLVWrapper.prototype.write_parsed_as_to_file = function (parsed_output) {
+        7;
         (0, fs_1.writeFile)("output.json", JSON.stringify(parsed_output), 'utf8', function (err) {
             if (err) {
                 console.log("An error occured while writing JSON Object to File.");
-                return console.log(err);
             }
             console.log("JSON file has been saved.");
         });
