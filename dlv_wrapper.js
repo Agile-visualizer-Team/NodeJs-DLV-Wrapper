@@ -3,6 +3,31 @@ exports.__esModule = true;
 exports.DLVWrapper = void 0;
 var child_process_1 = require("child_process");
 var fs_1 = require("fs");
+function parse_args() {
+    var argv = require("yargs")
+        .scriptName("dlv_wrapper")
+        .usage("Usage: $0 -w num -h num")
+        .option("d", {
+        alias: "dlv_path",
+        describe: "The path of the dlv solver",
+        demandOption: "The dlv excutable is required.",
+        type: "string"
+    })
+        .option("i", {
+        alias: "asp_file",
+        describe: "ASP file to solve",
+        demandOption: "The input file is required.",
+        type: "string"
+    })
+        .option("o", {
+        alias: "output",
+        describe: "path to the output file",
+        type: "string"
+    })
+        .describe("help", "Show help.").argv;
+    console.log(argv);
+    return argv;
+}
 var DLVWrapper = /** @class */ (function () {
     function DLVWrapper() {
     }
@@ -29,23 +54,32 @@ var DLVWrapper = /** @class */ (function () {
         });
         return result_object;
     };
-    DLVWrapper.prototype.write_parsed_as_to_file = function (parsed_output) {
+    DLVWrapper.prototype.write_parsed_as_to_file = function (output_file, parsed_output) {
         7;
-        (0, fs_1.writeFile)("output.json", JSON.stringify(parsed_output), 'utf8', function (err) {
+        (0, fs_1.writeFile)(output_file, JSON.stringify(parsed_output), 'utf8', function (err) {
             if (err) {
                 console.log("An error occured while writing JSON Object to File.");
             }
             console.log("JSON file has been saved.");
         });
     };
+    DLVWrapper.prototype.execute = function (argv) {
+        var res = this.run_dlv(argv.dlv_path, argv.asp_file);
+        var parsed_as = this.parse_dlv_as(res);
+        if (argv.output) {
+            this.write_parsed_as_to_file(argv.output, [parsed_as]);
+        }
+        else {
+            console.log([parsed_as]);
+        }
+    };
     return DLVWrapper;
 }());
 exports.DLVWrapper = DLVWrapper;
 function main() {
-    var wrapped = new DLVWrapper();
-    var res = wrapped.run_dlv('./dlv', 'asp_test/asptest1.asp');
-    var parsed_as = wrapped.parse_dlv_as(res);
-    wrapped.write_parsed_as_to_file([parsed_as]);
+    //parsing command args
+    var argv = parse_args();
+    new DLVWrapper().execute(argv);
 }
 if (require.main === module) {
     main();

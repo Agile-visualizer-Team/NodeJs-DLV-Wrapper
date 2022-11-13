@@ -95,7 +95,7 @@ describe('run_dlv()',() =>{
         let mocked_writefile =  sinon.mock(fs)
         let expectation = mocked_writefile.expects('writeFile')
         let spy = sinon.spy(console, 'log')
-        dlvWrapper.write_parsed_as_to_file(test.input)
+        dlvWrapper.write_parsed_as_to_file('mock_path', test.input)
         expect(expectation.getCall(0).args.includes(JSON.stringify(test.input))).to.be.true
       });
 

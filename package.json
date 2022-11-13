@@ -11,6 +11,11 @@
   },
   "scripts": {
     "test": "mocha -r ts-node/register tests/test_*.ts",
-    "start": "node dlv_wrapper.js"
+    "start": "node dlv_wrapper.js",
+    "acceptance_test": "mocha -r ts-node/register acceptance_tests/test_*.ts"
+  },
+  "dependencies": {
+    "@types/yargs": "^17.0.13",
+    "yargs": "^17.6.2"
   }
 }

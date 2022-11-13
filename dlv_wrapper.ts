@@ -2,6 +2,31 @@
 import { execSync } from 'child_process';
 import { writeFile } from 'fs';
 
+function parse_args(){
+    var { argv } = require("yargs")
+    .scriptName("dlv_wrapper")
+    .usage("Usage: $0 -w num -h num")
+    .option("d", {
+      alias: "dlv_path",
+      describe: "The path of the dlv solver",
+      demandOption: "The dlv excutable is required.",
+      type: "string",
+    })
+    .option("i", {
+      alias: "asp_file",
+      describe: "ASP file to solve",
+      demandOption: "The input file is required.",
+      type: "string",
+    })
+    .option("o", {
+      alias: "output",
+      describe: "path to the output file",
+      type: "string",
+    })
+    .describe("help", "Show help.")
+    console.log(argv)
+    return argv
+}
 export class DLVWrapper{
 
     run_dlv(dlv_path: string, asp_file: string) {
@@ -29,8 +54,8 @@ export class DLVWrapper{
         return result_object;
     }
 
-    write_parsed_as_to_file(parsed_output : object){7
-        writeFile("output.json", JSON.stringify(parsed_output), 'utf8', function (err) {
+    write_parsed_as_to_file(output_file: string, parsed_output : object){7
+        writeFile(output_file, JSON.stringify(parsed_output), 'utf8', function (err) {
             if (err) {
                 console.log("An error occured while writing JSON Object to File.");
             }
@@ -38,13 +63,23 @@ export class DLVWrapper{
             console.log("JSON file has been saved.");
         });
     }
+
+    execute(argv: any){
+        let res = this.run_dlv(argv.dlv_path,argv.asp_file);
+        let parsed_as = this.parse_dlv_as(res)
+        if (argv.output){
+            this.write_parsed_as_to_file(argv.output, [parsed_as]);
+        }
+        else{
+            console.log([parsed_as])
+        }
+    }
 }
 
 function main(){
-    let wrapped = new DLVWrapper()
-    let res = wrapped.run_dlv('./dlv', 'asp_test/asptest1.asp');
-    let parsed_as = wrapped.parse_dlv_as(res)
-    wrapped.write_parsed_as_to_file([parsed_as]);
+    //parsing command args
+    let argv = parse_args();
+    new DLVWrapper().execute(argv)
 }
 
 
