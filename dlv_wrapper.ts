@@ -5,7 +5,7 @@ import { writeFile } from 'fs';
 function parse_args(){
     var { argv } = require("yargs")
     .scriptName("dlv_wrapper")
-    .usage("Usage: $0 -w num -h num")
+    .usage("Usage: node $0 -d dlv -i asp_file [-o output_file]")
     .option("d", {
       alias: "dlv_path",
       describe: "The path of the dlv solver",
@@ -24,15 +24,23 @@ function parse_args(){
       type: "string",
     })
     .describe("help", "Show help.")
-    console.log(argv)
     return argv
 }
 export class DLVWrapper{
 
     run_dlv(dlv_path: string, asp_file: string) {
-        return "" + execSync(`${dlv_path} ${asp_file}`);
+        return "" + execSync(`./${dlv_path} ${asp_file}`);
     }
 
+    /**
+     * It takes dlv output as input, splits it into lines, then for each line it checks if there's a match
+     * for an answer set or an answer set cost, and if there is, it extracts the answer set or the cost and
+     * puts it into the result object
+     * @param {string} dlv_output - string
+     * @returns an object with two properties:
+     * - as: an array of strings, each string is an answer set
+     * - cost: a string, the cost of the answer set
+     */
     parse_dlv_as(dlv_output: string){
         let splitted_output = dlv_output.split('\n');
         let result_object: {[id: string] : any} = {
@@ -64,6 +72,11 @@ export class DLVWrapper{
         });
     }
 
+    /**
+     * It takes the path to the dlv executable and the path to the asp file, runs dlv on the asp file,
+     * parses the answer set, and writes the parsed answer set to a file
+     * @param {any} argv - any
+     */
     execute(argv: any){
         let res = this.run_dlv(argv.dlv_path,argv.asp_file);
         let parsed_as = this.parse_dlv_as(res)
