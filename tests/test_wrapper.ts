@@ -43,7 +43,7 @@ describe('run_dlv()',() =>{
       asp_file_path: 'asp_test/incoherent.asp',
     },
     {
-      dlv_path: './dlv',
+      dlv_path: 'dlv',
       asp_file_path: 'asp_test/asptest1.asp',
     },
   ]
@@ -54,7 +54,7 @@ describe('run_dlv()',() =>{
 
       dlvWrapper.run_dlv(test.dlv_path,test.asp_file_path);
       
-      expect(expectation.calledOnceWithExactly(`${test.dlv_path} ${test.asp_file_path}`)).to.be.true
+      expect(expectation.calledOnceWithExactly(`./${test.dlv_path} ${test.asp_file_path}`)).to.be.true
       mock.restore()
     });
   });
