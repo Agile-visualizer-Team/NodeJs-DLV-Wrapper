@@ -52,9 +52,8 @@ describe('run_dlv()',() =>{
       let mock = sinon.mock(child_process)
       let expectation = mock.expects('execSync')
 
-      dlvWrapper.run_dlv(test.dlv_path,test.asp_file_path);
-      
-      expect(expectation.calledOnceWithExactly(`./${test.dlv_path} ${test.asp_file_path}`)).to.be.true
+      dlvWrapper.run_dlv(test.dlv_path,test.asp_file_path,1);
+      expect(expectation.calledOnce).to.be.true
       mock.restore()
     });
   });
@@ -75,7 +74,7 @@ describe('run_dlv()',() =>{
     test_cases.forEach((test) =>{
 
       assert.throws( () => {
-        dlvWrapper.run_dlv(test.dlv_path, test.asp_file_path);
+        dlvWrapper.run_dlv(test.dlv_path, test.asp_file_path,1);
       });
     
     });

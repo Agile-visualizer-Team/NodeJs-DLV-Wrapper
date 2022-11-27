@@ -24,14 +24,20 @@ function parse_args() {
         describe: "path to the output file",
         type: "string"
     })
+        .option("n", {
+        alias: "as_number",
+        describe: "Number of AS you want to display, insert 0 for all",
+        type: "number",
+        "default": 1
+    })
         .describe("help", "Show help.").argv;
     return argv;
 }
 var DLVWrapper = /** @class */ (function () {
     function DLVWrapper() {
     }
-    DLVWrapper.prototype.run_dlv = function (dlv_path, asp_file) {
-        return "" + (0, child_process_1.execSync)("./".concat(dlv_path, " ").concat(asp_file));
+    DLVWrapper.prototype.run_dlv = function (dlv_path, asp_file, as_num) {
+        return "" + (0, child_process_1.execSync)("./".concat(dlv_path, " -n").concat(as_num, " ").concat(asp_file));
     };
     /**
      * It takes dlv output as input, splits it into lines, then for each line it checks if there's a match
@@ -77,13 +83,29 @@ var DLVWrapper = /** @class */ (function () {
      * @param {any} argv - any
      */
     DLVWrapper.prototype.execute = function (argv) {
-        var res = this.run_dlv(argv.dlv_path, argv.asp_file);
-        var parsed_as = this.parse_dlv_as(res);
-        if (argv.output) {
-            this.write_parsed_as_to_file(argv.output, [parsed_as]);
+        var _this = this;
+        var res = this.run_dlv(argv.dlv_path, argv.asp_file, argv.as_number);
+        var split_multiple_as = res.split(/(?<=COST \d+@\d+)/);
+        var final_array = [];
+        if (split_multiple_as.length == 1) {
+            final_array = split_multiple_as[0].split(/\n{1}/);
         }
         else {
-            console.log([parsed_as]);
+            final_array = [split_multiple_as[0]].concat(split_multiple_as[1].split('\n'));
+            final_array.splice(2, 1);
+        }
+        var forDeletion = ['', 'OPTIMUM', 'DLV 2.1.1'];
+        var final_output = [];
+        final_array = final_array.filter(function (item) { return !forDeletion.includes(item); });
+        final_array.forEach(function (element) {
+            var parsed_as = _this.parse_dlv_as(element);
+            final_output.push(parsed_as);
+        });
+        if (argv.output) {
+            this.write_parsed_as_to_file(argv.output, final_output);
+        }
+        else {
+            console.log(JSON.stringify(final_output));
         }
     };
     return DLVWrapper;

@@ -23,7 +23,7 @@ describe('acceptance test',  () => {
         }
 
         dlvWrapper.execute(argv);
-        expect(console_stub.calledOnceWithExactly([{ 'as': [ 'm(2)', 's(2,3)' ], 'cost': '1@1' }])).to.be.true;
+        expect(console_stub.calledOnceWithExactly(JSON.stringify([{ 'as': [ 'm(2)', 's(2,3)' ], 'cost': '1@1' }]))).to.be.true;
         dlv_executable_stub.restore()
         console_stub.restore()
     });

@@ -23,13 +23,19 @@ function parse_args(){
       describe: "path to the output file",
       type: "string",
     })
+    .option("n", {
+        alias: "as_number",
+        describe: "Number of AS you want to display, insert 0 for all",
+        type: "number",
+        default: 1,
+      })
     .describe("help", "Show help.")
     return argv
 }
 export class DLVWrapper{
 
-    run_dlv(dlv_path: string, asp_file: string) {
-        return "" + execSync(`./${dlv_path} ${asp_file}`);
+    run_dlv(dlv_path: string, asp_file: string,as_num: number) {
+        return "" + execSync(`./${dlv_path} -n${as_num} ${asp_file}`);
     }
 
     /**
@@ -78,13 +84,29 @@ export class DLVWrapper{
      * @param {any} argv - any
      */
     execute(argv: any){
-        let res = this.run_dlv(argv.dlv_path,argv.asp_file);
-        let parsed_as = this.parse_dlv_as(res)
-        if (argv.output){
-            this.write_parsed_as_to_file(argv.output, [parsed_as]);
+        let res = this.run_dlv(argv.dlv_path,argv.asp_file,argv.as_number);
+        let split_multiple_as = res.split(/(?<=COST \d+@\d+)/)
+        let final_array: any = []
+        if(split_multiple_as.length == 1){
+            final_array = split_multiple_as[0].split(/\n{1}/)
         }
         else{
-            console.log([parsed_as])
+            final_array = [split_multiple_as[0]].concat(split_multiple_as[1].split('\n'))
+            final_array.splice(2,1)
+
+        }
+        let forDeletion = ['','OPTIMUM','DLV 2.1.1']
+        let final_output:any = []
+        final_array = final_array.filter(item => !forDeletion.includes(item))
+        final_array.forEach(element => {
+            let parsed_as = this.parse_dlv_as(element) 
+            final_output.push(parsed_as)
+        });
+        if (argv.output){
+            this.write_parsed_as_to_file(argv.output, final_output);
+        }
+        else{
+            console.log(JSON.stringify(final_output))
         }
     }
 }
