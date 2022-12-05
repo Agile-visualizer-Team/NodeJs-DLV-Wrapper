@@ -37,7 +37,7 @@ var DLVWrapper = /** @class */ (function () {
     function DLVWrapper() {
     }
     DLVWrapper.prototype.run_dlv = function (dlv_path, asp_file, as_num) {
-        return "" + (0, child_process_1.execSync)("./".concat(dlv_path, " -n").concat(as_num, " ").concat(asp_file));
+        return "" + (0, child_process_1.execSync)("".concat(dlv_path, " -n").concat(as_num, " ").concat(asp_file));
     };
     /**
      * It takes dlv output as input, splits it into lines, then for each line it checks if there's a match
