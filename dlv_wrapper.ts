@@ -35,7 +35,7 @@ function parse_args(){
 export class DLVWrapper{
 
     run_dlv(dlv_path: string, asp_file: string,as_num: number) {
-        return "" + execSync(`./${dlv_path} -n${as_num} ${asp_file}`);
+        return "" + execSync(`${dlv_path} -n${as_num} ${asp_file}`);
     }
 
     /**
